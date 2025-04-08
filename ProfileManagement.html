@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Profile Management</title>
+</head>
+<body>
+    <h1 id="title">My Profile</h1>
+
+    <form onsubmit="return validateForm()">
+
+        Name: <input type="text" id="name" value=""><br>
+
+        <p id="nameMsg"></p>
+
+        Email: <input type="email" id="email" value=""><br>
+
+        <p id="emailMsg"></p>
+
+        Password: <input type="password" id="password" value=""><br>
+
+        <p id="passMsg"></p>
+
+        Image: <input type="file" id="Picture" name="Picture"/><br>
+
+        <input type="submit" value="Save Changes">
+
+        
+    </form>
+
+    
+
+    <script>
+
+
+        function validateForm() {
+            let name = document.getElementById('name').value;
+            let email = document.getElementById('email').value;
+            let pass = document.getElementById('password').value;
+
+            let valid = true;
+
+
+
+            if (name == "") {
+                document.getElementById('nameMsg').innerHTML = "Name required!";
+                document.getElementById('nameMsg').style.color = "red";
+                valid = false;
+            } 
+
+            
+            else {
+                document.getElementById('nameMsg').innerHTML = "";
+            }
+
+
+            if (email == "") {
+                document.getElementById('emailMsg').innerHTML = "Email required!";
+                document.getElementById('emailMsg').style.color = "red";
+                valid = false;
+            } 
+            
+            
+            
+            else {
+                document.getElementById('emailMsg').innerHTML = "";
+            }
+
+            if (pass == "") {
+                document.getElementById('passMsg').innerHTML = "Password required!";
+                document.getElementById('passMsg').style.color = "red";
+                valid = false;
+            }
+            
+            
+            else {
+                document.getElementById('passMsg').innerHTML = "";
+            }
+
+            if (valid) {
+                alert("Profile updated!");
+            }
+
+
+            return false; // prevent form from refreshing page
+
+        }
+
+        
+    </script>
+
+</body>
+</html>
