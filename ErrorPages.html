@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Error Pages</title>
+     <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <form method="" action="" enctype="">
+        <fieldset>
+            <legend>404 Not Found</legend>
+            <table>
+                <tr>
+                    <td>The page you are looking for could not be found.</td>
+                </tr>
+                <tr>
+                    <td><a href="index.html">Go Back to Safety</a></td>
+                </tr>
+            </table>
+        </fieldset>
+    </form>
+
+    <form method="" action="" enctype="">
+        <fieldset>
+            <legend>500 Server Error</legend>
+            <table>
+                <tr>
+                    <td>The server encountered an internal error.</td>
+                </tr>
+                <tr>
+                    <td><a href="index.html">Go Back to Safety</a></td>
+                </tr>
+            </table>
+        </fieldset>
+    </form>
+
+    <script>
+        // Determine which error page to show
+        if (document.URL.indexOf("code=404") > -1) {
+                // The 404 form is already visible, no need to change display.
+        } else if (document.URL.indexOf("code=500") > -1) {
+                //  Hide 404 form.
+                document.forms[0].style.display = 'none';
+                //  Show 500 form.
+                document.forms[1].style.display = 'block';
+        } else {
+                // Show a default error page (404 in this case)
+                document.forms[1].style.display = 'none';
+        }
+    </script>
+</body>
+</html>

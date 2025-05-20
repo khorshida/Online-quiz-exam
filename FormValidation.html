@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Form Validation</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <form id="myForm"  onsubmit="return validateForm()" method="" action="" enctype="">
+        <fieldset>
+            <legend>Sign in</legend>
+            <table>
+                <tr>
+                    <td>Name:</td>
+                    <td><input type="text" id="name" name="name" value="" /> 
+                    <p id="name-error"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Email:</td>
+                    <td><input type="text" id="email" name="email" value="" />
+                    <p id="email-error"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Password:</td>
+                    <td><input type="password" id="password" name="password" value="" />
+                    <p id="password-error"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" name="submit" id="submitButton" value="Submit"/></td>
+                </tr>
+            </table>
+        </fieldset>
+    </form>
+
+    <script>
+       // Get form and input elements
+        const form = document.getElementById('myForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const nameError = document.getElementById('name-error');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+        const submitButton = document.getElementById('submitButton');
+
+
+
+        // --- Validation Functions ---
+        function validateName() {
+            let nameValue = nameInput.value.trim();
+            if (nameValue === '') {
+                nameError.textContent = "Name is required";
+                return false;
+            } else if (nameValue.length < 3) {
+                nameError.textContent = "Name must be at least 3 characters";
+                return false;
+            } else {
+                nameError.textContent = "";
+                return true;
+            }
+        }
+
+        function validateEmail() {
+            let emailValue = emailInput.value.trim();
+            let atPosition = emailValue.indexOf("@");
+            let dotPosition = emailValue.lastIndexOf(".");
+            if (emailValue === '') {
+                emailError.textContent = "Email is required";
+                return false;
+            } else if (atPosition < 1 || dotPosition < atPosition + 2 || dotPosition + 2 >= emailValue.length) {
+                emailError.textContent = "Invalid email format";
+                return false;
+            } else {
+                emailError.textContent = "";
+                return true;
+            }
+        }
+
+        function validatePassword() {
+            let passwordValue = passwordInput.value.trim();
+            if (passwordValue === '') {
+                passwordError.textContent = "Password is required";
+                return false;
+            } else if (passwordValue.length < 6) {
+                passwordError.textContent = "Password must be at least 6 characters";
+                return false;
+            } else {
+                passwordError.textContent = "";
+                return true;
+            }
+        }
+
+
+
+        // --- Form Submission ---
+        function validateForm() {
+            let isNameValid = validateName();
+            let isEmailValid = validateEmail();
+            let isPasswordValid = validatePassword();
+
+            if (isNameValid && isEmailValid && isPasswordValid) {
+                return true; // Allow form submission
+            } else {
+                alert("Please fix the errors in the form.");
+                return false; // Prevent form submission
+            }
+        }
+
+
+    </script>
+</body>
+</html>

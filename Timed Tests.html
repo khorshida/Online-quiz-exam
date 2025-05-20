@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+    <title>Timed Tests</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+
+    <h1>Timed Tests</h1>
+
+    <!-- Timer Settings Screen -->
+    <div id="timerScreen">
+        <form>   
+            <fieldset>
+                <legend>Timer Settings</legend>
+                <table>
+                    <tr>
+                        <td>Test Duration (minutes)</td>
+                        <td>
+                            <input type="text" id="testDuration" value=""/>
+                            <p id="durationMsg" style="color: red;"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Question Duration (minutes)</td>
+                        <td>
+                            <input type="text" id="questionDuration" value=""/>
+                            <p id="questionMsg" style="color: red;"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type="button" value="Start Test" onclick="startTest()"/>
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+        </form>
+    </div>
+
+    <!-- Countdown Display Screen -->
+    <div id="countdownScreen" style="display: none;">
+        <fieldset>
+            <legend>Test in Progress</legend>
+            <table>
+                <tr>
+                    <td>Time Remaining:</td>
+                    <td><span id="timeDisplay"></span></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="button" value="End Test" onclick="endTest()"/>
+                        <input type="button" value="Add Time" onclick="addTime()"/>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+    </div>
+
+    <script>
+        var testTime = 0;
+        var questionTime = 0;
+        var timeLeft = 0;
+        var timerInterval;
+
+        function startTest() {
+            var testInput = document.getElementById("testDuration").value;
+            var questionInput = document.getElementById("questionDuration").value;
+            var durationMsg = document.getElementById("durationMsg");
+            var questionMsg = document.getElementById("questionMsg");
+
+            durationMsg.innerHTML = "";
+            questionMsg.innerHTML = "";
+
+            if(testInput == "") {
+                durationMsg.innerHTML = "please enter test duration!";
+                return;
+            }
+
+            if(questionInput == "") {
+                questionMsg.innerHTML = "please enter question duration!";
+                return;
+            }
+
+            testTime = parseInt(testInput);
+            questionTime = parseInt(questionInput);
+            timeLeft = testTime * 60;
+
+            document.getElementById("timerScreen").style.display = "none";
+            document.getElementById("countdownScreen").style.display = "block";
+
+            startTimer();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            var minutes = Math.floor(timeLeft / 60);
+            var seconds = timeLeft % 60;
+            
+            document.getElementById("timeDisplay").innerHTML = 
+                minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+            if(timeLeft <= 0) {
+                endTest();
+            } else {
+                timeLeft = timeLeft - 1;
+            }
+        }
+
+        function endTest() {
+            clearInterval(timerInterval);
+            document.getElementById("timerScreen").style.display = "block";
+            document.getElementById("countdownScreen").style.display = "none";
+        }
+
+        function addTime() {
+            timeLeft = timeLeft + (5 * 60);
+            updateTimer();
+        }
+    </script>
+</body>
+</html>

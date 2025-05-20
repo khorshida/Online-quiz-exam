@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Automatic Scoring</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h1>Automatic Scoring</h1>
+
+    <table>
+        <tr>
+            <td>
+                
+<input type="button" value="Input" onclick="showScreen('input')"/>
+<input type="button" value="Rubric" onclick="showScreen('rubric')"/>
+<input type="button" value="Score" onclick="showScreen('score')"/>
+<input type="button" value="Grade" onclick="showScreen('grade')"/>
+            </td>
+        </tr>
+    </table>
+
+    <div id="inputDiv"
+    style="display: block">
+      
+        <fieldset>
+            <legend>Add Question</legend>
+            <table>
+                <tr>
+                    <td>Type:</td>
+                    <td>
+                        <select id="type">
+                            <option value="mcq">MCQ</option>
+                            <option value="tf">True/False</option>
+                            <option value="essay">Essay</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Difficulty:</td>
+                    <td>
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                   <td>Partial Credit:</td>
+                   <td>
+                    <input type="number" id="partial" value="100" min="0" max="100"/> %
+                   </td>
+                </tr>
+
+                <tr>
+                    <td>Question:</td>
+                    <td>
+                        <input type="text" id="question" value=""/>
+                        <p id="msg" style="color: red;"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="button" value="Add" onclick="addQuestion()"/></td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <div id="questionList"></div>
+    </div>
+
+    <div id="rubricDiv" style="display: none">
+        <fieldset>
+            <legend>Rubric</legend>
+            <table>
+                <tr><td>MCQ:</td><td>5 points</td></tr>
+                <tr><td>True/False:</td><td>2 points</td></tr>
+                <tr><td>Essay:</td><td>Manual Review</td></tr>
+            </table>
+        </fieldset>
+    </div>
+
+    <div id="scoreDiv" style="display: none">
+        <fieldset>
+            <legend>Score</legend>
+            <div id="scoreOutput"></div>
+        </fieldset>
+    </div>
+
+    <div id="gradeDiv" style="display: none">
+        <fieldset>
+            <legend>Grade</legend>
+            <div id="gradeOutput"></div>
+        </fieldset>
+    </div>
+
+    <script>
+        var questions = [];
+        var count = 0;
+        var totalScore = 0;
+
+        function showScreen(screenName) {
+            document.getElementById("inputDiv").style.display = "none";
+            document.getElementById("rubricDiv").style.display = "none";
+            document.getElementById("scoreDiv").style.display = "none";
+            document.getElementById("gradeDiv").style.display = "none";
+
+            if(screenName === "input") {
+                document.getElementById("inputDiv").style.display = "block";
+            }
+            if(screenName === "rubric") {
+                document.getElementById("rubricDiv").style.display = "block";
+            }
+            if(screenName === "score") {
+                document.getElementById("scoreDiv").style.display = "block";
+                calculateScore();
+            }
+            if(screenName === "grade") {
+                document.getElementById("gradeDiv").style.display = "block";
+                calculateGrade();
+            }
+        }
+
+        function addQuestion() {
+            var type = document.getElementById("type").value;
+            var text = document.getElementById("question").value;
+            var diff = document.getElementById("difficulty").value;
+            var partial = document.getElementById("partial").value;
+            var msg = document.getElementById("msg");
+
+            msg.innerHTML = "";
+
+            if(text == "") {
+                msg.innerHTML = "Please enter a question.";
+                return;
+            }
+
+            if(type === "essay") {
+                questions[count] = [type, text, diff, partial, "Review Required"];
+            } else {
+                questions[count] = [type, text, diff, partial, "Auto-graded"];
+            }
+
+            count++;
+
+            document.getElementById("question").value = "";
+            document.getElementById("partial").value = "100";
+
+            showQuestions();
+        }
+
+        function showQuestions() {
+            var listDiv = document.getElementById("questionList");
+            var html = "<ul>";
+            for(var i = 0; i < questions.length; i++) {
+                html += "<li>" + (i+1) + ". " + questions[i][1] + " (" + questions[i][0] + ", " + questions[i][2] + ")</li>";
+            }
+            html += "</ul>";
+            listDiv.innerHTML = html;
+        }
+
+        function calculateScore() {
+            totalScore = 0;
+            var scoreOutput = "";
+
+            for (var i = 0; i < count; i++) {
+                var type = questions[i][0];
+                var credit = parseInt(questions[i][3]);
+                var score = 0;
+
+                if (type === "mcq") {
+                    score = 5 * (credit / 100);
+                } else if (type === "tf") {
+                    score = 2 * (credit / 100);
+                } else {
+                    score = "Pending Review";
+                }
+
+                if (typeof score === "number") {
+                    totalScore += score;
+                }
+
+                scoreOutput += "Question " + (i + 1) + " Score: " + score + "<br>";
+            }
+
+            scoreOutput += "<br>Total gScore: " + totalScore;
+            document.getElementById("scoreOutput").innerHTML = scoreOutput;
+        }
+
+        function calculateGrade() {
+            var grade = "";
+
+            if (totalScore >= 9) {
+                grade = "A";
+            } else if (totalScore >= 7) {
+                grade = "B";
+            } else if (totalScore >= 5) {
+                grade = "C";
+            } else {
+                grade = "D";
+            }
+
+            document.getElementById("gradeOutput").innerHTML = "Your Grade: " + grade;
+        }
+    </script>
+</body>
+</html>

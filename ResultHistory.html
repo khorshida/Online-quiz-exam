@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result History</title>
+     <link rel="stylesheet" type="text/css" href="style.css" >
+</head>
+<body>
+    <h1>Result History</h1>
+
+    <table>
+        <tr>
+            <td>
+                <input type="button" value="View History" onclick="showHistory()"/>
+                <input type="button" value="Compare" onclick="showCompare()"/>
+                <input type="button" value="Export" onclick="showExport()"/>
+            </td>
+        </tr>
+    </table>
+
+    <div id="historyDiv">
+        <fieldset>
+            <legend>View Attempt History</legend>
+            <table>
+                <tr>
+                    <td>Date/Time:</td>
+                    <td><span id="timestamp"></span></td>
+                </tr>
+                <tr>
+                    <td>Test:</td>
+                    <td>
+                        <select id="test" onchange="updateAttempts()">
+                            <option value="">Select Test</option>
+                            <option value="test1">Test 1</option>
+                            <option value="test2">Test 2</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div id="attemptList"></div>
+        </fieldset>
+    </div>
+
+    <div id="compareDiv" style="display:none">
+        <fieldset>
+            <legend>Compare Test Versions</legend>
+            <table>
+                <tr>
+                    <td>Version 1:</td>
+                    <td>
+                        <select id="version1">
+                            <option value="v1">Version 1</option>
+                            <option value="v2">Version 2</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Version 2:</td>
+                    <td>
+                        <select id="version2">
+                            <option value="v1">Version 1</option>
+                            <option value="v2">Version 2</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="button" value="Compare" onclick="compare()"/></td>
+                </tr>
+            </table>
+            <div id="compareResults"></div>
+        </fieldset>
+    </div>
+
+    <div id="exportDiv" style="display:none">
+        <fieldset>
+            <legend>Export Results</legend>
+            <table>
+                <tr>
+                    <td>Format:</td>
+                    <td>
+                        <select id="format">
+                            <option value="pdf">PDF</option>
+                            <option value="txt">Text</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="button" value="Export" onclick="exportResults()"/></td>
+                </tr>
+            </table>
+        </fieldset>
+    </div>
+
+    <script>
+        var attempts = [];
+        var count = 0;
+
+        function showHistory() {
+            document.getElementById("historyDiv").style.display = "block";
+            document.getElementById("compareDiv").style.display = "none";
+            document.getElementById("exportDiv").style.display = "none";
+            updateTime();
+        }
+
+        function showCompare() {
+            document.getElementById("historyDiv").style.display = "none";
+            document.getElementById("compareDiv").style.display = "block";
+            document.getElementById("exportDiv").style.display = "none";
+        }
+
+        function showExport() {
+            document.getElementById("historyDiv").style.display = "none";
+            document.getElementById("compareDiv").style.display = "none";
+            document.getElementById("exportDiv").style.display = "block";
+        }
+
+        function updateTime() {
+            var date = new Date();
+            document.getElementById("timestamp").innerHTML = date.toLocaleString();
+        }
+
+        function updateAttempts() {
+            var test = document.getElementById("test").value;
+            var list = document.getElementById("attemptList");
+            var content = "";
+
+            if(test == "test1") {
+                content = content + "<fieldset>";
+                content = content + "<legend>Attempts</legend>";
+                content = content + "<table>";
+                content = content + "<tr><td>Attempt 1:</td><td>Score: 85</td></tr>";
+                content = content + "<tr><td>Attempt 2:</td><td>Score: 90</td></tr>";
+                content = content + "</table></fieldset>";
+            }
+            if(test == "test2") {
+                content = content + "<fieldset>";
+                content = content + "<legend>Attempts</legend>";
+                content = content + "<table>";
+                content = content + "<tr><td>Attempt 1:</td><td>Score: 75</td></tr>";
+                content = content + "</table></fieldset>";
+            }
+
+            list.innerHTML = content;
+        }
+
+        function compare() {
+            var v1 = document.getElementById("version1").value;
+            var v2 = document.getElementById("version2").value;
+            var results = document.getElementById("compareResults");
+            var content = "";
+
+            content = content + "<fieldset>";
+            content = content + "<legend>Comparison</legend>";
+            content = content + "<table>";
+            content = content + "<tr><td>" + v1 + ":</td><td>Score: 85</td></tr>";
+            content = content + "<tr><td>" + v2 + ":</td><td>Score: 90</td></tr>";
+            content = content + "</table></fieldset>";
+
+            results.innerHTML = content;
+        }
+
+        function exportResults() {
+            var format = document.getElementById("format").value;
+            attempts[count] = ["Results exported as " + format, new Date().toLocaleString()];
+            count = count + 1;
+            alert("Results exported as " + format);
+        }
+
+        showHistory();
+    </script>
+</body>
+</html>
