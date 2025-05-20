@@ -1,0 +1,201 @@
+
+
+
+    <title>Test Categories</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+
+    <h1>Test Categories</h1>
+
+    <table>
+        <tr>
+            <td>
+                <input type="button" value="Categories" onclick="showCategories()"/>
+                <input type="button" value="Tests" onclick="showTests()"/>
+            </td>
+        </tr>
+    </table>
+
+    <div id="categoryDiv" style="display: block;">
+        <fieldset>
+            <legend>Add Category</legend>
+            <table>
+                <tr>
+                    <td>Parent:</td>
+                    <td>
+                        <select id="parent">
+                            <option value="">None</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Name:</td>
+                    <td>
+                        <input type="text" id="name"/>
+                        <p id="msg" style="color: red;"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Level:</td>
+                    <td>
+                        <select id="level">
+                            <option value="basic">Basic</option>
+                            <option value="medium">Medium</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="button" value="Add" onclick="add()"/></td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <div id="list"></div>
+    </div>
+
+    <div id="testDiv" style="display: none;">
+        <fieldset>
+            <legend>Assign Tests</legend>
+            <table>
+                <tr>
+                    <td>Category:</td>
+                    <td><select id="category" onchange="updateTests()"></select></td>
+                </tr>
+                <tr>
+                    <td>Tests:</td>
+                    <td><select id="tests" multiple></select></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="button" value="Assign" onclick="assign()"/></td>
+                </tr>
+            </table>
+        </fieldset>
+    </div>
+
+    <script>
+        var categories = [];
+        var count = 0;
+
+        function showCategories() {
+            document.getElementById("categoryDiv").style.display = "block";
+            document.getElementById("testDiv").style.display = "none";
+            updateParents();
+            displayList();
+        }
+
+        function showTests() {
+            document.getElementById("categoryDiv").style.display = "none";
+            document.getElementById("testDiv").style.display = "block";
+            updateCategories();
+        }
+
+        function add() {
+            var parent = document.getElementById("parent").value;
+            var name = document.getElementById("name").value;
+            var level = document.getElementById("level").value;
+            var msg = document.getElementById("msg");
+
+            msg.innerHTML = "";
+
+            if(name == "") {
+                msg.innerHTML = "please enter name";
+                return;
+            }
+
+            categories[count] = [parent, name, level];
+            count = count + 1;
+
+            document.getElementById("name").value = "";
+            updateParents();
+            displayList();
+        }
+
+        function updateParents() {
+            var select = document.getElementById("parent");
+            var content = "<option value=''>None</option>";
+
+            for(var i = 0; i < count; i++) {
+                content = content + "<option value='" + i + "'>";
+                content = content + categories[i][1];
+                content = content + "</option>";
+            }
+
+            select.innerHTML = content;
+        }
+
+        function displayList() {
+            var list = document.getElementById("list");
+            var content = "";
+
+            for(var i = 0; i < count; i++) {
+                content = content + "<fieldset>";
+                content = content + "<legend>" + categories[i][1] + "</legend>";
+                content = content + "<table>";
+                
+                if(categories[i][0] != "") {
+                    content = content + "<tr><td>Parent:</td><td>";
+                    content = content + categories[categories[i][0]][1];
+                    content = content + "</td></tr>";
+                }
+                
+                content = content + "<tr><td>Level:</td><td>";
+                content = content + categories[i][2];
+                content = content + "</td></tr>";
+                content = content + "</table></fieldset>";
+            }
+
+            list.innerHTML = content;
+        }
+
+        function updateCategories() {
+            var select = document.getElementById("category");
+            var content = "";
+
+            for(var i = 0; i < count; i++) {
+                content = content + "<option value='" + i + "'>";
+                content = content + categories[i][1];
+                content = content + "</option>";
+            }
+
+            select.innerHTML = content;
+            updateTests();
+        }
+
+        function updateTests() {
+            var tests = document.getElementById("tests");
+            var content = "";
+
+            content = content + "<option>Test 1</option>";
+            content = content + "<option>Test 2</option>";
+            content = content + "<option>Test 3</option>";
+
+            tests.innerHTML = content;
+        }
+
+        function assign() {
+            var category = document.getElementById("category");
+            var tests = document.getElementById("tests");
+            var selected = [];
+
+            for(var i = 0; i < tests.options.length; i++) {
+                if(tests.options[i].selected == true) {
+                    selected[selected.length] = tests.options[i].text;
+                }
+            }
+
+            var selectedCategoryIndex = parseInt(category.value);
+            var categoryName = "";
+            if(!isNaN(selectedCategoryIndex) && categories[selectedCategoryIndex]) {
+                categoryName = categories[selectedCategoryIndex][1];
+            }
+
+            alert("Assigned to " + categoryName + ": " + selected.join(", "));
+        }
+
+        showCategories();
+    </script>
+
+

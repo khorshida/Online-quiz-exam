@@ -1,75 +1,410 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <title>Question Bank</title>
+    <title>Question Bank System</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-  <h2>Question Bank</h1>
-    <form method="post" action="">
-      <table>
-        <tr>
-          <tb>
-            <label for="choices">Question type:</label>
-<select id="choices" name="choices">
-  <option value="option1">Mcq</option>
-  <option value="option2">True false</option>
-  <option value="option3">essay</option>
-
-  
-</select>
-
-          </tb>
-          <tb>
-            <label for="difficulty">Difficulty:</label>
-            <select id="difficulty" name="difficulties">
-              <option value="easy">easy</option>
-              <option value="medium">medium</option>
-              <option value="hard">hard</option>
-            
-            </select>
-          </tb>
-        </tr>
-        <h3>Questions:</h3>
-        <tr>
-          <td>
-            <input id="q1" type="text" value="type your question here">
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input id="q2" type="text" value="type your question here">
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input id="q3" type="text" value="type your question here">
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <button id="edit" value="edit">Edit</button>
-            <button id="delete" value="delete">delete</button>
-          </td>
-          
-            
-          
-        </tr>
-        <tr>
-          <td>
-            <button id="submit" value="submit">Submit</button>
-          </td>
-        </tr>
-      </table>
-    </form>
-
+    <h1>Question Bank System</h1>
     
+    <!-- Navigation -->
+    <table>
+        <tr>
+            <td>
+                <input type="button" value="Question Editor" onclick="showScreen('editor')"/>
+                <input type="button" value="Question Browser" onclick="showScreen('browser')"/>
+                <input type="button" value="Tag Manager" onclick="showScreen('tag')"/>
+            </td>
+        </tr>
+    </table>
 
-    
+    <!-- Question Editor -->
+    <div id="editorScreen">
+        <form>   
+            <fieldset>
+                <legend>Create Question</legend>
+                <table>
+                    <tr>
+                        <td>Description</td>
+                        <td>
+                            <input type="text" id="description" value=""/>
+                            <p id="descMsg" style="color: red;"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Question Type</td>
+                        <td>
+                            <select id="questionType" onchange="toggleOptions()">
+                                <option value="mcq">MCQ</option>
+                                <option value="true_false">True/False</option>
+                                
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Question</td>
+                        <td>
+                            <input type="text" id="questionText" value=""/>
+                            <p id="qMsg" style="color: red;"></p>
+                        </td>
+                    </tr>
+                    <tr id="mcqOptions">
+                        <td>Options</td>
+                        <td>
+                            <input type="text" id="opt1" value="" placeholder="Option 1"/><br>
+                            <input type="text" id="opt2" value="" placeholder="Option 2"/><br>
+                            <input type="text" id="opt3" value="" placeholder="Option 3"/><br>
+                            <input type="text" id="opt4" value="" placeholder="Option 4"/>
+                            <p id="optMsg" style="color: red;"></p>
+                        </td>
+                    </tr>
+                    <tr id="tfOptions" style="display: none;">
+                        <td>Options</td>
+                        <td>
+                            <input type="radio" name="tfOption" value="true" id="trueOption"> True
+                            <input type="radio" name="tfOption" value="false" id="falseOption"> False
+                            <p id="tfMsg" style="color: red;"></p>
+                        </td>
+                    </tr>
 
-    
-            
-            
-            
+                    <tr>
+                        <td>Tags</td>
+                        <td>
+                            <select id="questionTags" multiple>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="button" value="Add Question" onclick="addQuestion()"/></td>
+                    </tr>
+                </table>
+            </fieldset>
+        </form>
+    </div>
 
+    <!-- Question Browser -->
+    <div id="browserScreen" style="display: none;">
+        <fieldset>
+            <legend>Browse Questions</legend>
+            <table>
+                <tr>
+                    <td>Filter Type:</td>
+                    <td>
+                        <select id="filterType" onchange="showQuestions()">
+                            <option value="all">All Types</option>
+                            <option value="mcq">MCQ</option>
+                            <option value="true_false">True/False</option>
+                        
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Filter Tag:</td>
+                    <td>
+                        <select id="filterTag" onchange="showQuestions()">
+                            <option value="all">All Tags</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div id="questionList"></div>
+        </fieldset>
+    </div>
+
+    <!-- Tag Manager -->
+    <div id="tagScreen" style="display: none;">
+        <fieldset>
+            <legend>Tag Manager</legend>
+            <table>
+                <tr>
+                    <td>New Tag:</td>
+                    <td>
+                        <input type="text" id="newTag" value=""/>
+                        <p id="tagMsg" style="color: red;"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="button" value="Add Tag" onclick="addTag()"/></td>
+                </tr>
+            </table>
+            <div id="tagList"></div>
+        </fieldset>
+    </div>
+
+    <script>
+        var questions = [];
+        var questionCount = 0;
+        var tags = [];
+        var tagCount = 0;
+
+        function showScreen(screenName) {
+            document.getElementById("editorScreen").style.display = "none";
+            document.getElementById("browserScreen").style.display = "none";
+            document.getElementById("tagScreen").style.display = "none";
+
+            if(screenName == "editor") {
+                document.getElementById("editorScreen").style.display = "block";
+            }
+            if(screenName == "browser") {
+                document.getElementById("browserScreen").style.display = "block";
+                showQuestions();
+            }
+            if(screenName == "tag") {
+                document.getElementById("tagScreen").style.display = "block";
+                showTags();
+            }
+        }
+
+        function toggleOptions() {
+            var type = document.getElementById("questionType").value;
+            var options = document.getElementById("mcqOptions");
+            var tfOptions = document.getElementById("tfOptions");
+
+            mcqOptions.style.display = "none";
+        tfOptions.style.display = "none";
+            
+        if(type == "mcq") {
+            mcqOptions.style.display = "table-row";
+        }
+        if(type == "true_false") {
+            tfOptions.style.display = "table-row";
+        } 
+        }
+
+        function addQuestion() {
+            var description = document.getElementById("description").value;
+            var type = document.getElementById("questionType").value;
+            var questionText = document.getElementById("questionText").value;
+            var descMsg = document.getElementById("descMsg");
+            var qMsg = document.getElementById("qMsg");
+            var optMsg = document.getElementById("optMsg");
+            var selectedTags = document.getElementById("questionTags").selectedOptions;
+
+            descMsg.innerHTML = "";
+            qMsg.innerHTML = "";
+            optMsg.innerHTML = "";
+
+            if(description == "") {
+                descMsg.innerHTML = "please enter description!";
+                return;
+            }
+
+            if(questionText == "") {
+                qMsg.innerHTML = "please enter question!";
+                return;
+            }
+
+            // Check duplicate
+            for(var i = 0; i < questionCount; i++) {
+                if(questions[i][2] == questionText) {
+                    qMsg.innerHTML = "similar question exists!";
+                    return;
+                }
+            }
+
+            questions[questionCount] = [description, type, questionText];
+
+            if(type == "mcq") {
+                var opt1 = document.getElementById("opt1").value;
+                var opt2 = document.getElementById("opt2").value;
+                var opt3 = document.getElementById("opt3").value;
+                var opt4 = document.getElementById("opt4").value;
+
+                if(opt1 == "" || opt2 == "" || opt3 == "" || opt4 == "") {
+                    optMsg.innerHTML = "please fill all options!";
+                    return;
+                }
+
+                questions[questionCount][3] = opt1;
+                questions[questionCount][4] = opt2;
+                questions[questionCount][5] = opt3;
+                questions[questionCount][6] = opt4;
+            }
+
+            if(type == "true_false") {
+    var trueOption = document.getElementById("trueOption");
+    var falseOption = document.getElementById("falseOption");
+    var tfMsg = document.getElementById("tfMsg");
+    tfMsg.innerHTML = "";
+
+    if(trueOption.checked == false && falseOption.checked == false) {
+        tfMsg.innerHTML = "please select an option!";
+        return;
+    }
+
+    if(trueOption.checked == true) {
+        questions[questionCount][3] = "True";
+    } else {
+        questions[questionCount][3] = "False";
+    }
+}
+
+            // Add selected tags
+            var questionTags = [];
+            for(var i = 0; i < selectedTags.length; i++) {
+                questionTags[i] = selectedTags[i].value;
+            }
+            questions[questionCount][7] = questionTags;
+
+            questionCount = questionCount + 1;
+
+            // Clear form
+            document.getElementById("description").value = "";
+            document.getElementById("questionText").value = "";
+            document.getElementById("opt1").value = "";
+            document.getElementById("opt2").value = "";
+            document.getElementById("opt3").value = "";
+            document.getElementById("opt4").value = "";
+            document.getElementById("trueOption").checked = false;
+    document.getElementById("falseOption").checked = false;
+
+            showQuestions();
+        }
+
+        function showQuestions() {
+            var filterType = document.getElementById("filterType").value;
+            var filterTag = document.getElementById("filterTag").value;
+            var questionList = document.getElementById("questionList");
+            var content = "";
+
+            for(var i = 0; i < questionCount; i++) {
+                var showQuestion = true;
+                
+                if(filterType != "all" && questions[i][1] != filterType) {
+                    showQuestion = false;
+                }
+                
+                if(filterTag != "all") {
+                    var hasTag = false;
+                    for(var j = 0; j < questions[i][7].length; j++) {
+                        if(questions[i][7][j] == filterTag) {
+                            hasTag = true;
+                        }
+                    }
+                    if(!hasTag) {
+                        showQuestion = false;
+                    }
+                }
+
+                if(showQuestion) {
+                    content = content + "<fieldset>";
+                    content = content + "<legend>Question " + (i + 1) + "</legend>";
+                    content = content + "<table>";
+                    content = content + "<tr><td>Description:</td><td>" + questions[i][0] + "</td></tr>";
+                    content = content + "<tr><td>Type:</td><td>" + questions[i][1] + "</td></tr>";
+                    content = content + "<tr><td>Question:</td><td>" + questions[i][2] + "</td></tr>";
+                    
+                    if(questions[i][1] == "mcq") {
+                        content = content + "<tr><td>Options:</td><td>";
+                        content = content + "1. " + questions[i][3] + "<br>";
+                        content = content + "2. " + questions[i][4] + "<br>";
+                        content = content + "3. " + questions[i][5] + "<br>";
+                        content = content + "4. " + questions[i][6] + "<br>";
+                        content = content + "</td></tr>";
+                    }
+                    if(questions[i][1] == "true_false") {
+    content = content + "<tr><td>Answer:</td><td>";
+    content = content + questions[i][3];
+    content = content + "</td></tr>";
+}
+
+if(questions[i][7].length > 0) {
+    content = content + "<tr><td>Tags:</td><td>";
+    for(var j = 0; j < questions[i][7].length; j++) {
+        content = content + questions[i][7][j];
+        if(j < questions[i][7].length - 1) {
+            content = content + ", ";
+        }
+    }
+    content = content + "</td></tr>";
+}
+
+                    content = content + "<tr><td></td><td>";
+                    content = content + "<input type='button' value='Delete' onclick='deleteQuestion(" + i + ")'/>";
+                    content = content + "</td></tr></table></fieldset><br>";
+                }
+            }
+
+            questionList.innerHTML = content;
+        }
+
+        function deleteQuestion(index) {
+            for(var i = index; i < questionCount - 1; i++) {
+                questions[i] = questions[i + 1];
+            }
+            questionCount = questionCount - 1;
+            showQuestions();
+        }
+
+        function addTag() {
+            var tagInput = document.getElementById("newTag").value;
+            var tagMsg = document.getElementById("tagMsg");
+
+            tagMsg.innerHTML = "";
+
+            if(tagInput == "") {
+                tagMsg.innerHTML = "please enter tag name!";
+                return;
+            }
+
+            for(var i = 0; i < tagCount; i++) {
+                if(tags[i] == tagInput) {
+                    tagMsg.innerHTML = "tag already exists!";
+                    return;
+                }
+            }
+
+            tags[tagCount] = tagInput;
+            tagCount = tagCount + 1;
+
+            document.getElementById("newTag").value = "";
+            updateTagLists();
+            showTags();
+        }
+
+        function showTags() {
+            var tagList = document.getElementById("tagList");
+            var content = "";
+
+            for(var i = 0; i < tagCount; i++) {
+                content = content + "<fieldset>";
+                content = content + "<table><tr>";
+                content = content + "<td>" + tags[i] + "</td>";
+                content = content + "<td><input type='button' value='Delete' onclick='deleteTag(" + i + ")'/></td>";
+                content = content + "</tr></table>";
+                content = content + "</fieldset><br>";
+            }
+
+            tagList.innerHTML = content;
+        }
+
+        function deleteTag(index) {
+            for(var i = index; i < tagCount - 1; i++) {
+                tags[i] = tags[i + 1];
+            }
+            tagCount = tagCount - 1;
+            updateTagLists();
+            showTags();
+        }
+
+        function updateTagLists() {
+            var questionTags = document.getElementById("questionTags");
+            var filterTag = document.getElementById("filterTag");
+            var qtContent = "";
+            var ftContent = "<option value='all'>All Tags</option>";
+
+            for(var i = 0; i < tagCount; i++) {
+                qtContent = qtContent + "<option value='" + tags[i] + "'>" + tags[i] + "</option>";
+                ftContent = ftContent + "<option value='" + tags[i] + "'>" + tags[i] + "</option>";
+            }
+
+            questionTags.innerHTML = qtContent;
+            filterTag.innerHTML = ftContent;
+        }
+
+        toggleOptions();
+    </script>
 </body>
 </html>

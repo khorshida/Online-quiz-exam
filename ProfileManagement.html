@@ -2,92 +2,163 @@
 <html lang="en">
 <head>
     <title>Profile Management</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .avatar-preview img {
+            width: 100px; /* Adjust as needed */
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover; /* Ensure image fills the circular area */
+        }
+    </style>
 </head>
 <body>
-    <h1 id="title">My Profile</h1>
+    <h1>Profile Management</h1>
 
-    <form method="post" action="profileValidation.php">
+    <table>
+        <tr>
+            <td>
+                <input type="button" value="View Profile" onclick="showScreen('viewProfile')"/>
+                <input type="button" value="Edit Profile" onclick="showScreen('editProfile')"/>
+                <input type="button" value="Change Avatar" onclick="showScreen('changeAvatar')"/>
+                <input type="button" value="Update Password" onclick="showScreen('updatePassword')"/>
+            </td>
+        </tr>
+    </table>
 
-        Name: <input type="text" id="name" value=""
-        name="name"><br>
+    <div id="viewProfile" class="screen">
+        <fieldset>
+            <legend>View Profile</legend>
+            <table>
+                <tr><td colspan="2" style="text-align: center;"><div class="avatar-preview"><img id="profileAvatar" src="" alt="Profile"/></div></td></tr>
+                <tr><td>Name:</td><td><span id="viewName">John Doe</span></td></tr>
+                <tr><td>Email:</td><td><span id="viewEmail">john@example.com</span></td></tr>
+                <tr><td>Joined:</td><td><span id="viewJoinDate">January 1, 2023</span></td></tr>
+            </table>
+        </fieldset>
+    </div>
 
-        <p id="nameMsg"></p>
+    <div id="editProfile" class="screen">
+        <fieldset>
+            <legend>Edit Profile</legend>
+            <table>
+                <tr><td>Name:</td><td><input type="text" id="editName" value="John Doe"/></td></tr>
+                <tr><td>Email:</td><td><input type="email" id="editEmail" value="john@example.com"/></td></tr>
+                <tr><td></td><td><input type="button" value="Save Changes" onclick="saveProfile()"/></td></tr>
+            </table>
+        </fieldset>
+    </div>
 
-        Email: <input type="text" id="email" name="email" value=""><br>
+    <div id="changeAvatar" class="screen">
+        <fieldset>
+            <legend>Change Profile Picture</legend>
+            <table>
+                <tr><td colspan="2" style="text-align: center;"><div class="avatar-preview"><img id="avatarPreview" src="" alt="New Profile"/></div></td></tr>
+                <tr><td>Select Image:</td><td><input type="file" id="avatarUpload" accept="image/*" onchange="previewAvatar()"/></td></tr>
+                <tr><td></td><td><input type="button" value="Set as Profile Picture" onclick="saveAvatar()"/></td></tr>
+            </table>
+        </fieldset>
+    </div>
 
-        <p id="emailMsg"></p>
-
-        Password: <input type="password" id="password" name="password" value=""><br>
-
-        <p id="passMsg"></p>
-
-        Image: <input type="file" id="Picture" name="Picture"/><br>
-
-        <input type="submit" value="Save Changes">
-
-        
-    </form>
-
-    
+    <div id="updatePassword" class="screen">
+        <fieldset>
+            <legend>Update Password</legend>
+            <table>
+                <tr><td>Current Password:</td><td><input type="password" id="currentPassword"/></td></tr>
+                <tr><td>New Password:</td><td><input type="password" id="newPassword"/></td></tr>
+                <tr><td>Confirm Password:</td><td><input type="password" id="confirmPassword"/></td></tr>
+                <tr><td></td><td><input type="button" value="Update Password" onclick="updatePassword()"/></td></tr>
+            </table>
+        </fieldset>
+    </div>
 
     <script>
+        
+        var userName = "John Doe";
+        var userEmail = "john@example.com";
+        var userJoinDate = "January 1, 2023";
+        var userAvatar = "";
 
+       
+        function showScreen(screenId) {
+            var screens = document.getElementsByClassName('screen');
+            for (var i = 0; i < screens.length; i++) {
+                screens[i].classList.remove('active');
+            }
+            document.getElementById(screenId).classList.add('active');
 
-        function validateForm() {
-            let name = document.getElementById('name').value;
-            let email = document.getElementById('email').value;
-            let pass = document.getElementById('password').value;
+            if (screenId === 'viewProfile') {
+                document.getElementById('viewName').textContent = userName;
+                document.getElementById('viewEmail').textContent = userEmail;
+                document.getElementById('viewJoinDate').textContent = userJoinDate;
+                document.getElementById('profileAvatar').src = userAvatar;
+                 if(!userAvatar){
+                    document.getElementById('profileAvatar').src = "https://via.placeholder.com/100";
+                 }
+            }        }
 
-            let valid = true;
+        // Save profile using simple variables
+        function saveProfile() {
+            userName = document.getElementById('editName').value;
+            userEmail = document.getElementById('editEmail').value;
+            alert("Profile updated successfully!");
+            showScreen('viewProfile');
+        }
 
+       
+        function previewAvatar() {
+            var file = document.getElementById('avatarUpload').files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
 
+        function saveAvatar() {
+            var newAvatar = document.getElementById('avatarPreview').src;
+            if (newAvatar) {
+                userAvatar = newAvatar;
+                alert("Profile picture updated!");
+                showScreen('viewProfile');
+            } else {
+                alert("Please select an image first!");
+            }
+        }
 
-            if (name == "") {
-                document.getElementById('nameMsg').innerHTML = "Name required!";
-                document.getElementById('nameMsg').style.color = "red";
-                valid = false;
-            } 
+        // Password update 
+        function updatePassword() {
+            var current = document.getElementById('currentPassword').value;
+            var newPass = document.getElementById('newPassword').value;
+            var confirm = document.getElementById('confirmPassword').value;
 
-            
-            else {
-                document.getElementById('nameMsg').innerHTML = "";
+            if (!current || !newPass || !confirm) {
+                alert("Please fill in all fields!");
+                return;
             }
 
-
-            if (email == "") {
-                document.getElementById('emailMsg').innerHTML = "Email required!";
-                document.getElementById('emailMsg').style.color = "red";
-                valid = false;
-            } 
-            
-            
-            
-            else {
-                document.getElementById('emailMsg').innerHTML = "";
+            if (newPass !== confirm) {
+                alert("New passwords don't match!");
+                return;
             }
 
-            if (pass == "") {
-                document.getElementById('passMsg').innerHTML = "Password required!";
-                document.getElementById('passMsg').style.color = "red";
-                valid = false;
-            }
-            
-            
-            else {
-                document.getElementById('passMsg').innerHTML = "";
-            }
-
-            if (valid) {
-                alert("Profile updated!");
-            }
-
-
-            return false;
-
+            alert("Password updated successfully!");
+            document.getElementById('currentPassword').value = "";
+            document.getElementById('newPassword').value = "";
+            document.getElementById('confirmPassword').value = "";
+            showScreen('viewProfile');
         }
 
         
+        showScreen('viewProfile');
     </script>
-
 </body>
 </html>
